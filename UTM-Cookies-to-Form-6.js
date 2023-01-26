@@ -98,6 +98,7 @@ function setUTMformValues() {
         let queryString = 'input[name*=\'' + utm_type + '\']';
         console.log(queryString);
         let utm_nodes = document.querySelectorAll(queryString);
+        console.log(utm_nodes);
         /* change all utm form fields */
         if (utm_nodes.length > 0) {
             for (var i = 0; i < utm_nodes.length; i++) {
