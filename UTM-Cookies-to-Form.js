@@ -84,12 +84,6 @@ function is_this_utm_equal_to_cookie_utm_values() {
 }
 
 function setUTMformValues() {
-    /* webflow form object (Add embed code under webflow designer inside FORM */
-    /*
-    <input type="text" class="utm_source" placeholder="utm_source" name="utm_source">
-<input type="text" class="utm_medium" placeholder="utm_medium" name="utm_medium">
-<input type="text" class="utm_campaign" placeholder="utm_campaign" name="utm_campaign">
-  */
     /* the value if the param is empty */
     const empty_param_case = "undefined";
     /* set fields */
