@@ -95,7 +95,7 @@ function setUTMformValues() {
     /* inner function */
     function set_utm_field(utm_type) {
         let utm_value = JSON.parse(Cookies.get('Lead')).parameters[utm_type];
-        let queryString = 'input[name^=\'' + utm_type + '\']';
+        let queryString = 'input[name*=\'' + utm_type + '\']';
         console.log(queryString);
         let utm_nodes = document.querySelectorAll(queryString);
         /* change all utm form fields */
