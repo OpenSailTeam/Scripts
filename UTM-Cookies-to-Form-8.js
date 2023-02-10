@@ -1,4 +1,4 @@
-const my_utmParameters = [
+  const my_utmParameters = [
     "gclid_field",
     "fbclid_field",
     "utm_source_field",
