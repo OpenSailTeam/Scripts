@@ -136,12 +136,12 @@ window.onload = cookieFormDataLayer();
               (function() {
                   form.addEventListener('submit', (event) => {
                       event.preventDefault(); // prevent page refresh
-                      console.log("form: " + form);
+                      //console.log("form: " + form);
                       let formData = new FormData(form);
                       for (let p of formData) {
                           let pair = {};
                           pair[p[0]] = p[1];
-                          console.log(p[0] + p[1]);
+                          //console.log(p[0] + p[1]);
                           window.dataLayer.push(pair);
                       }
                       let eventId = {};
@@ -153,18 +153,18 @@ window.onload = cookieFormDataLayer();
       }
 
       var regularForms = document.getElementsByTagName('form');
-      console.log("regularForms: " + regularForms);
+      //console.log("regularForms: " + regularForms);
 
       populateData(regularForms);
 
-      console.log(iframes);
+      //console.log(iframes);
 
       for (let iframe of iframes) {
 
           var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
 
           let jotforms = innerDoc.getElementsByClassName('jotform-form');
-          console.log("jotforms: " + jotforms);
+          //console.log("jotforms: " + jotforms);
           populateData(jotforms);
 
       }
