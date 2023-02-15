@@ -48,14 +48,14 @@ if (!isEmpty && cookieExist !== undefined) {
         //console.log("Case 3 - lead Exist, but with diff params");
         Cookies.remove('Lead');
         createLead();
-        setUTMformValues();
+        setUTMformValues(document);
      	for (let iframe of iframes) {
         	var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
         	setUTMformValues(innerDoc);
     	}
     } else {
         //console.log("Case 2 - lead exist with these params");
-        setUTMformValues();
+        setUTMformValues(document);
 		for (let iframe of iframes) {
         	var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
         	setUTMformValues(innerDoc);
@@ -66,7 +66,7 @@ if (!isEmpty && cookieExist !== undefined) {
 /* Case 4 - cookie Exist  but page without any utm param */
 if (isEmpty && cookieExist !== undefined) {
     //console.log("Case 4 - cookie Exist  but page without any utm param");
-    setUTMformValues();
+    setUTMformValues(document);
 	for (let iframe of iframes) {
         var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
         setUTMformValues(innerDoc);
