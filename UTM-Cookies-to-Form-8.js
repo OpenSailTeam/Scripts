@@ -1,12 +1,12 @@
-  const my_utmParameters = [
-    "gclid_field",
-    "fbclid_field",
-    "utm_source_field",
-    "utm_medium_field",
-    "utm_campaign_field",
-    "fbp_field",
-    "fbc_field"
+ const my_utmParameters = [
+    "gclid",
+    "fbclid",
+    "utm_source",
+    "utm_medium",
+    "utm_campaign"
 ];
+
+const iframes = document.getElementsByTagName("iframe");
 
 function getAllUrlParams(url) {
     let obj = Object.fromEntries(new URLSearchParams(location.search));
@@ -30,7 +30,11 @@ if (!isEmpty && cookieExist === undefined) {
     expires: If omitted, the cookie becomes a session cookie (This example)
     */
     createLead();
-    setUTMformValues();
+    setUTMformValues(document);
+    for (let iframe of iframes) {
+        var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+        setUTMformValues(innerDoc);
+    }
 } /*end if*/
 
 let compare = is_this_utm_equal_to_cookie_utm_values();
@@ -83,7 +87,7 @@ function is_this_utm_equal_to_cookie_utm_values() {
     return true;
 }
 
-function setUTMformValues() {
+function setUTMformValues(doc) {
     /* the value if the param is empty */
     const empty_param_case = "undefined";
     /* set fields */
@@ -96,7 +100,7 @@ function setUTMformValues() {
     function set_utm_field(utm_type) {
         let utm_value = JSON.parse(Cookies.get('Lead')).parameters[utm_type];
         let queryString = 'input[name*=\'' + utm_type + '\']';
-        let utm_nodes = document.querySelectorAll(queryString);
+        let utm_nodes = doc.querySelectorAll(queryString);
         /* change all utm form fields */
         if (utm_nodes.length > 0) {
             for (var i = 0; i < utm_nodes.length; i++) {
