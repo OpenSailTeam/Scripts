@@ -1,7 +1,5 @@
 $(document).on( "ready", function() { 
   
-    $('iframe').on( "load", function() { 
-  
     const my_utmParameters = [
       "gclid",
       "fbclid",
@@ -168,5 +166,4 @@ $(document).on( "ready", function() {
           populateData(jotforms);
 
       }
-  });
 });
