@@ -1,4 +1,4 @@
-function cookies() {
+$(function() {
 
 	const my_utmParameters = [
 		"gclid",
