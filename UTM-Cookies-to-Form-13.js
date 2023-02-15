@@ -122,8 +122,6 @@ function main() {
 				for (var i = 0; i < utm_nodes.length; i++) {
 					if (!!utm_value && utm_value !== undefined) {
 						utm_nodes[i].value = utm_value;
-						console.log(utm_nodes[i]);
-						console.log(utm_nodes[i].value);
 					} else {
 						/* empty param for example ?utm_campaign= or ?utm_campaign */
 						utm_nodes[i].value = empty_param_case;
