@@ -1,4 +1,4 @@
-$(document).on( "ready", function() { 
+window.addEventListener("load", (event) => {
   
     const my_utmParameters = [
       "gclid",
