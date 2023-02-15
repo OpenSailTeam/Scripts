@@ -1,6 +1,6 @@
-$(document).ready(function() { 
+$(document).on( "ready", function() { 
   
-    $('iframe').load(function() { 
+    $('iframe').on( "load", function() { 
   
     const my_utmParameters = [
       "gclid",
