@@ -1,6 +1,6 @@
-window.onload = cookieFormDataLayer();
+$(document).ready(function() { 
   
-  function cookieFormDataLayer(){
+    $('iframe').load(function() { 
   
     const my_utmParameters = [
       "gclid",
@@ -168,4 +168,5 @@ window.onload = cookieFormDataLayer();
           populateData(jotforms);
 
       }
-  }
+  });
+});
