@@ -129,7 +129,7 @@ window.addEventListener("load", (event) => {
       } // end inner set_utm_field function */
     }
 
-    function populateData(forms) {
+    function populateData(forms, forceSubmit) {
           for (let form of forms) {
               (function() {
                   form.addEventListener('submit', (event) => {
@@ -145,7 +145,9 @@ window.addEventListener("load", (event) => {
                       let eventId = {};
                       eventId["event_id"] = Date.now().toString();
                       window.dataLayer.push(eventId);
-                      form.submit();
+                      if (forceSubmit) {
+                        form.submit();
+                      }
                   });
               }());
           }
@@ -154,7 +156,7 @@ window.addEventListener("load", (event) => {
       var regularForms = document.getElementsByTagName('form');
       //console.log("regularForms: " + regularForms);
 
-      populateData(regularForms);
+      populateData(regularForms, false);
 
       //console.log(iframes);
 
@@ -164,7 +166,7 @@ window.addEventListener("load", (event) => {
 
           let jotforms = innerDoc.getElementsByClassName('jotform-form');
           //console.log("jotforms: " + jotforms);
-          populateData(jotforms);
+          populateData(jotforms, true);
 
       }
 });
