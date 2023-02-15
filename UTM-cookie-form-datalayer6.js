@@ -145,6 +145,7 @@ window.addEventListener("load", (event) => {
                       let eventId = {};
                       eventId["event_id"] = Date.now().toString();
                       window.dataLayer.push(eventId);
+                      form.submit();
                   });
               }());
           }
