@@ -1,6 +1,6 @@
-window.onload = main;
+window.onload = cookies;
 
-function main() {
+function cookies() {
 
 	const my_utmParameters = [
 		"gclid",
