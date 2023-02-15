@@ -1,5 +1,3 @@
-window.onload = cookies;
-
 function cookies() {
 
 	const my_utmParameters = [
