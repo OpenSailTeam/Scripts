@@ -49,9 +49,17 @@ if (!isEmpty && cookieExist !== undefined) {
         Cookies.remove('Lead');
         createLead();
         setUTMformValues();
+     	for (let iframe of iframes) {
+        	var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+        	setUTMformValues(innerDoc);
+    	}
     } else {
         //console.log("Case 2 - lead exist with these params");
         setUTMformValues();
+		for (let iframe of iframes) {
+        	var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+        	setUTMformValues(innerDoc);
+    	}
     }
 }
 
@@ -59,6 +67,10 @@ if (!isEmpty && cookieExist !== undefined) {
 if (isEmpty && cookieExist !== undefined) {
     //console.log("Case 4 - cookie Exist  but page without any utm param");
     setUTMformValues();
+	for (let iframe of iframes) {
+        var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+        setUTMformValues(innerDoc);
+    }
 }
 
 function createLead() {
