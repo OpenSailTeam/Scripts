@@ -1,5 +1,3 @@
-// Updated Script 2023-04-18
-
 window.addEventListener("load", (event) => {
   
     const my_utmParameters = [
@@ -139,11 +137,20 @@ window.addEventListener("load", (event) => {
                       //console.log("form: " + form);
                       let formData = new FormData(form);
                       for (let p of formData) {
-                          let pair = {};
-                          pair[p[0]] = p[1];
-                          //console.log(p[0] + p[1]);
-                          window.dataLayer.push(pair);
+                        let pair = {};
+                        let key = p[0];
+                        let value = p[1];
+                        if (key.startsWith('q')) {
+                          const regex = /^q\d+_(.*)$/;
+                          const match = key.match(regex);
+                          if (match) {
+                            key = match[1];
+                          }
+                        }
+                        pair[key] = value;
+                        window.dataLayer.push(pair);
                       }
+
                       let eventId = {};
                       eventId["event_id"] = Date.now().toString();
                       window.dataLayer.push(eventId);
