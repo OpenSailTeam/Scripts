@@ -1,3 +1,5 @@
+// Updated Script 2023-04-18
+
 window.addEventListener("load", (event) => {
   
     const my_utmParameters = [
