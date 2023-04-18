@@ -148,6 +148,7 @@ window.addEventListener("load", (event) => {
                           }
                         }
                         pair[key] = value;
+                        console.log(pair);
                         window.dataLayer.push(pair);
                       }
 
