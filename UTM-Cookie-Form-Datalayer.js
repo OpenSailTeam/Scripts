@@ -156,11 +156,9 @@ window.addEventListener("load", (event) => {
     eventId["event_id"] = Date.now().toString();
     window.dataLayer.push(eventId);
     
-    setTimeout(() => {
-        if (forceSubmit) {
-            form.submit();
-        }
-    }, 2500); // wait 2.5 seconds before submitting the form
+    if (forceSubmit) {
+        form.submit();
+    }
 });
 
               }());
