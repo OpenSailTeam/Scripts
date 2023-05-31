@@ -176,11 +176,14 @@ window.addEventListener("load", (event) => {
 
       for (let iframe of iframes) {
 
-          var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+          try {
+            var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+            let jotforms = innerDoc.getElementsByClassName('jotform-form');
+            //console.log("jotforms: " + jotforms);
+            populateData(jotforms, true);
+          } catch (error) {
+          }
 
-          let jotforms = innerDoc.getElementsByClassName('jotform-form');
-          //console.log("jotforms: " + jotforms);
-          populateData(jotforms, true);
 
       }
 });
