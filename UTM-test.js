@@ -149,7 +149,7 @@ window.addEventListener("load", (event) => {
                         }
                         pair[key] = value;
                         console.log(pair);
-                        window.dataLayer.push(pair);
+                        console.log(window.dataLayer.push(pair));
                       }
 
                       let eventId = {};
