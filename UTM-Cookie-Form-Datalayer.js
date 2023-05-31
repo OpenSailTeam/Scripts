@@ -160,7 +160,7 @@ window.addEventListener("load", (event) => {
                         if (forceSubmit) {
                             form.submit();
                         }
-                    }, 2500); // wait 2.5 seconds before submitting the form
+                    }, 5000); // wait 5 seconds before submitting the form
                 });
               }());
           }
