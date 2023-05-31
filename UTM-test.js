@@ -132,33 +132,37 @@ window.addEventListener("load", (event) => {
     function populateData(forms, forceSubmit) {
           for (let form of forms) {
               (function() {
-                  form.addEventListener('submit', (event) => {
-                      event.preventDefault(); // prevent page refresh
-                      console.log("form: " + form);
-                      let formData = new FormData(form);
-                      for (let p of formData) {
-                        let pair = {};
-                        let key = p[0];
-                        let value = p[1];
-                        if (key.startsWith('q')) {
-                          const regex = /^q\d+_(.*)$/;
-                          const match = key.match(regex);
-                          if (match) {
-                            key = match[1];
-                          }
-                        }
-                        pair[key] = value;
-                        console.log(pair);
-                        console.log(window.dataLayer.push(pair));
-                      }
+                    form.addEventListener('submit', (event) => {
+    event.preventDefault(); // prevent page refresh
+    //console.log("form: " + form);
+    let formData = new FormData(form);
+    for (let p of formData) {
+        let pair = {};
+        let key = p[0];
+        let value = p[1];
+        if (key.startsWith('q')) {
+            const regex = /^q\d+_(.*)$/;
+            const match = key.match(regex);
+            if (match) {
+                key = match[1];
+            }
+        }
+        pair[key] = value;
+        //console.log(pair);
+        window.dataLayer.push(pair);
+    }
 
-                      let eventId = {};
-                      eventId["event_id"] = Date.now().toString();
-                      window.dataLayer.push(eventId);
-                      if (forceSubmit) {
-                        form.submit();
-                      }
-                  });
+    let eventId = {};
+    eventId["event_id"] = Date.now().toString();
+    window.dataLayer.push(eventId);
+    
+    setTimeout(() => {
+        if (forceSubmit) {
+            form.submit();
+        }
+    }, 2500); // wait 2.5 seconds before submitting the form
+});
+
               }());
           }
       }
@@ -172,11 +176,14 @@ window.addEventListener("load", (event) => {
 
       for (let iframe of iframes) {
 
-          var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+          try {
+            var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+            let jotforms = innerDoc.getElementsByClassName('jotform-form');
+            //console.log("jotforms: " + jotforms);
+            populateData(jotforms, true);
+          } catch (error) {
+          }
 
-          let jotforms = innerDoc.getElementsByClassName('jotform-form');
-          //console.log("jotforms: " + jotforms);
-          populateData(jotforms, true);
 
       }
 });
