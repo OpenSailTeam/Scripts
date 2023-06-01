@@ -111,7 +111,7 @@ window.addEventListener("load", (event) => {
 
     function setUTMformValues(doc) {
         /* the value if the param is empty */
-        const empty_param_case = "undefined";
+        const empty_param_case = "";
         /* set fields */
         for (const this_utm_element of my_utmParameters) {
             /* if utm_source exist */
