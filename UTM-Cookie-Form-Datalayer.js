@@ -1,8 +1,6 @@
 window.addEventListener("load", (event) => {
 
     const my_utmParameters = [
-        "gclid",
-        "fbclid",
         "utm_source",
         "utm_medium",
         "utm_campaign"
