@@ -149,6 +149,10 @@ window.addEventListener("load", (event) => {
                         break;
                     }
                 }
+
+                if (hasEmptyRequiredField) {
+                    return;
+                }
     
                 let formData = new FormData(form);
                 for (let p of formData) {
