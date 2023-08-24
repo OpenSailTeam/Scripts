@@ -139,39 +139,54 @@ window.addEventListener("load", (event) => {
 
     function populateData(forms, forceSubmit) {
         for (let form of forms) {
-            (function() {
-                form.addEventListener('submit', (event) => {
-                    event.preventDefault(); // prevent page refresh
-                    //console.log("form: " + form);
-                    let formData = new FormData(form);
-                    for (let p of formData) {
-                        let pair = {};
-                        let key = p[0];
-                        let value = p[1];
-                        if (key.startsWith('q')) {
-                            const regex = /^q\d+_(.*)$/;
-                            const match = key.match(regex);
-                            if (match) {
-                                key = match[1];
-                            }
+            form.addEventListener('submit', (event) => {
+                event.preventDefault(); // prevent page refresh
+    
+                let hasEmptyRequiredField = false;
+                for (let element of form.elements) {
+                    // Check if the element is nested within a <li> with class 'always-hidden'
+                    if (element.closest('.always-hidden, .form-field-hidden')) {
+                        continue; // Skip this element
+                    }
+                    
+                    if (element.required && !element.value.trim()) {
+                        hasEmptyRequiredField = true;
+                        break;
+                    }
+                }
+    
+                if (hasEmptyRequiredField) {
+                    return;
+                }
+    
+                let formData = new FormData(form);
+                for (let p of formData) {
+                    let pair = {};
+                    let key = p[0];
+                    let value = p[1];
+                    if (key.startsWith('q')) {
+                        const regex = /^q\d+_(.*)$/;
+                        const match = key.match(regex);
+                        if (match) {
+                            key = match[1];
                         }
-                        pair[key] = value;
-                        //console.log(pair);
-                        window.dataLayer.push(pair);
                     }
-
-                    let eventId = {};
-                    eventId["event_id"] = Date.now().toString();
-                    window.dataLayer.push(eventId);
-
-                    if (forceSubmit) {
-                        form.submit();
-                    }
-                });
-
-            }());
+                    pair[key] = value;
+                    window.dataLayer.push(pair);
+                }
+    
+                let eventId = {};
+                eventId["event_id"] = Date.now().toString();
+                window.dataLayer.push(eventId);
+    
+                if (forceSubmit) {
+                    form.submit();
+                }
+            });
         }
     }
+
+
 
     var regularForms = document.getElementsByTagName('form');
     //console.log("regularForms: " + regularForms);
