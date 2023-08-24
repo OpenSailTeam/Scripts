@@ -156,8 +156,6 @@ window.addEventListener("load", (event) => {
                 }
     
                 if (hasEmptyRequiredField) {
-                    // Notify the user or do some action here if a required field is empty
-                    alert("Please fill all required fields.");
                     return;
                 }
     
