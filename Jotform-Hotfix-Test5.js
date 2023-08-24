@@ -145,7 +145,7 @@ window.addEventListener("load", (event) => {
                 let hasEmptyRequiredField = false;
                 for (let element of form.elements) {
                     // Check if the element is nested within a <li> with class 'always-hidden'
-                    if (element.closest('li.always-hidden')) {
+                    if (element.closest('.always-hidden, .form-field-hidden')) {
                         continue; // Skip this element
                     }
                     
