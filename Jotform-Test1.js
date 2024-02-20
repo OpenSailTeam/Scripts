@@ -37,7 +37,7 @@ window.addEventListener("load", (event) => {
             try {
                 var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
                 setUTMformValues(innerDoc);
-            } catch (error) {}
+            } catch (error) {console.error(error);}
         }
     } /*end if*/
 
@@ -57,7 +57,7 @@ window.addEventListener("load", (event) => {
                 try {
                     var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
                     setUTMformValues(innerDoc);
-                } catch (error) {}
+                } catch (error) {console.error(error);}
             }
         } else {
             //console.log("Case 2 - lead exist with these params");
@@ -66,7 +66,7 @@ window.addEventListener("load", (event) => {
                 try {
                     var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
                     setUTMformValues(innerDoc);
-                } catch (error) {}
+                } catch (error) {console.error(error);}
             }
         }
     }
@@ -79,7 +79,7 @@ window.addEventListener("load", (event) => {
             try {
                 var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
                 setUTMformValues(innerDoc);
-            } catch (error) {}
+            } catch (error) {console.error(error);}
         }
     }
 
@@ -202,6 +202,6 @@ window.addEventListener("load", (event) => {
             let jotforms = innerDoc.getElementsByClassName('jotform-form');
             //console.log("jotforms: " + jotforms);
             populateData(jotforms, true);
-        } catch (error) {}
+        } catch (error) {console.error(error);}
     }
 });
