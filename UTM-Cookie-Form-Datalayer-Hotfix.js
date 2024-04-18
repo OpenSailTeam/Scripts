@@ -7,8 +7,6 @@ window.addEventListener("load", (event) => {
         "utm_campaign"
     ];
 
-    const iframes = document.getElementsByTagName("iframe");
-
     // Function to extract UTM parameters from the URL
     function getUTMParams(url) {
         const params = new URLSearchParams(location.search);
@@ -65,14 +63,6 @@ window.addEventListener("load", (event) => {
 
     // Set UTM form values on main document and iframes
     setUTMformValues(document, utmParams);
-    Array.from(iframes).forEach(iframe => {
-        try {
-            const innerDoc = iframe.contentDocument || iframe.contentWindow.document;
-            setUTMformValues(innerDoc, utmParams);
-        } catch (error) {
-            console.error('Error accessing iframe content:', error);
-        }
-    });
 
     function populateData(forms, forceSubmit) {
         for (let form of forms) {
@@ -123,22 +113,7 @@ window.addEventListener("load", (event) => {
         }
     }
 
-
-
     var regularForms = document.getElementsByTagName('form');
-    //console.log("regularForms: " + regularForms);
-
     populateData(regularForms, false);
-
-    //console.log(iframes);
-
-    for (let iframe of iframes) {
-
-        try {
-            var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
-            let jotforms = innerDoc.getElementsByClassName('jotform-form');
-            //console.log("jotforms: " + jotforms);
-            populateData(jotforms, true);
-        } catch (error) {}
-    }
+    
 });
