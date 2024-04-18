@@ -11,9 +11,9 @@ window.addEventListener("load", (event) => {
     function getUTMParams(url) {
         const params = new URLSearchParams(url.search);
         const utms = {};
-        params.forEach((value, key) => {
-            if (my_utmParameters.includes(key)) {
-                utms[key] = value;
+        my_utmParameters.forEach(key => {
+            if (params.has(key)) {
+                utms[key] = params.get(key);
             }
         });
         return utms;
@@ -33,34 +33,29 @@ window.addEventListener("load", (event) => {
         document.cookie = `${name}=${value}; expires=${date.toUTCString()}; path=/`;
     }
 
-    // Function to delete a cookie
-    function deleteCookie(name) {
-        document.cookie = `${name}=; Max-Age=-99999999; path=/`;
-    }
-
     // Read the current UTM parameters from the URL
     const urlUTMParams = getUTMParams(window.location);
 
     // Check if 'Lead' cookie exists and parse it
     const cookieValue = getCookie('Lead');
     const cookieExist = cookieValue ? JSON.parse(decodeURIComponent(cookieValue)) : null;
-    const cookieUTMs = cookieExist ? cookieExist.parameters : null;
+    const cookieUTMs = cookieExist ? cookieExist.parameters : {};
 
     // Compare current UTM params with those stored in the cookie
-    function areUTMsDifferent(cookieUTMs, currentUTMs) {
-        return !my_utmParameters.every(param => (cookieUTMs && cookieUTMs[param]) === currentUTMs[param]);
+    function shouldUpdateCookie(cookieUTMs, currentUTMs) {
+        return Object.keys(currentUTMs).length > 0 && !my_utmParameters.every(param => cookieUTMs[param] === currentUTMs[param]);
     }
 
-    // Update or create cookie with new UTM data if different
-    if (areUTMsDifferent(cookieUTMs, urlUTMParams)) {
-        const lead = { parameters: urlUTMParams };
+    // Update or create cookie with new UTM data if appropriate
+    if (shouldUpdateCookie(cookieUTMs, urlUTMParams)) {
+        const lead = { parameters: {...cookieUTMs, ...urlUTMParams} };
         setCookie('Lead', encodeURIComponent(JSON.stringify(lead)), 7);
     }
 
     // Set or update form UTM values
     function setUTMformValues(doc, utms) {
         my_utmParameters.forEach(param => {
-            const utmValue = utms ? utms[param] : "";
+            const utmValue = utms[param] || "";
             const selectors = `input[name*='${param}']`;
             doc.querySelectorAll(selectors).forEach(node => {
                 node.value = utmValue;
@@ -68,8 +63,8 @@ window.addEventListener("load", (event) => {
         });
     }
 
-    // Use URL UTM parameters if they differ from the cookie, otherwise use cookie UTMs
-    setUTMformValues(document, (areUTMsDifferent(cookieUTMs, urlUTMParams) ? urlUTMParams : cookieUTMs));
+    // Set UTM form values using the most recent UTM data
+    setUTMformValues(document, cookieUTMs);
 
     function populateData(forms, forceSubmit) {
         for (let form of forms) {
