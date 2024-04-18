@@ -9,7 +9,7 @@ window.addEventListener("load", (event) => {
 
     // Function to extract UTM parameters from the URL
     function getUTMParams(url) {
-        const params = new URLSearchParams(location.search);
+        const params = new URLSearchParams(url.search);
         const utms = {};
         params.forEach((value, key) => {
             if (my_utmParameters.includes(key)) {
@@ -19,14 +19,34 @@ window.addEventListener("load", (event) => {
         return utms;
     }
 
-    const cookieExist = Cookies.get('Lead'); // Check if 'Lead' cookie exists
-    const utmParams = getUTMParams(location.href); // Get UTM parameters from URL
-    const isEmpty = jQuery.isEmptyObject(utmParams); // Check if no UTM parameters
+    // Function to get a cookie by name
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+
+    // Function to set a cookie
+    function setCookie(name, value, days) {
+        const date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        document.cookie = `${name}=${value}; expires=${date.toUTCString()}; path=/`;
+    }
+
+    // Function to delete a cookie
+    function deleteCookie(name) {
+        document.cookie = `${name}=; Max-Age=-99999999; path=/`;
+    }
+
+    // Check if 'Lead' cookie exists and parse it
+    const cookieValue = getCookie('Lead');
+    const cookieExist = cookieValue ? JSON.parse(decodeURIComponent(cookieValue)) : null;
+    const utmParams = cookieExist ? cookieExist.parameters : getUTMParams(window.location);
 
     // Function to create or update the lead cookie
     function createLead(utms) {
         const lead = { parameters: utms };
-        Cookies.set('Lead', JSON.stringify(lead), {});
+        setCookie('Lead', encodeURIComponent(JSON.stringify(lead)), 7);
     }
 
     // Compare current UTM params with those stored in the cookie
@@ -51,13 +71,13 @@ window.addEventListener("load", (event) => {
     }
 
     // Logic to create or update cookies based on UTM presence and comparison
-    if (!isEmpty && cookieExist) {
-        const cookieUTMs = JSON.parse(cookieExist).parameters;
+    if (!jQuery.isEmptyObject(utmParams) && cookieExist) {
+        const cookieUTMs = cookieExist.parameters;
         if (!areUTMsEqual(cookieUTMs, utmParams)) {
-            Cookies.remove('Lead'); // Remove old cookie
+            deleteCookie('Lead'); // Remove old cookie
             createLead(utmParams); // Create new cookie with new UTM data
         }
-    } else if (!isEmpty && !cookieExist) {
+    } else if (!jQuery.isEmptyObject(utmParams) && !cookieExist) {
         createLead(utmParams); // Create new cookie if none exists
     }
 
@@ -68,24 +88,23 @@ window.addEventListener("load", (event) => {
         for (let form of forms) {
             form.addEventListener('submit', (event) => {
                 event.preventDefault(); // prevent page refresh
-    
+
                 let hasEmptyRequiredField = false;
                 for (let element of form.elements) {
-                    // Check if the element is nested within a <li> with class 'always-hidden'
                     if (element.closest('.always-hidden, .form-field-hidden')) {
                         continue; // Skip this element
                     }
-                    
+
                     if (element.required && !element.value.trim()) {
                         hasEmptyRequiredField = true;
                         break;
                     }
                 }
-    
+
                 if (hasEmptyRequiredField) {
                     return;
                 }
-    
+
                 let formData = new FormData(form);
                 for (let p of formData) {
                     let pair = {};
@@ -101,11 +120,11 @@ window.addEventListener("load", (event) => {
                     pair[key] = value;
                     window.dataLayer.push(pair);
                 }
-    
+
                 let eventId = {};
                 eventId["event_id"] = Date.now().toString();
                 window.dataLayer.push(eventId);
-    
+
                 if (forceSubmit) {
                     form.submit();
                 }
