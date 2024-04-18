@@ -39,7 +39,7 @@ window.addEventListener("load", (event) => {
     // Check if 'Lead' cookie exists and parse it
     const cookieValue = getCookie('Lead');
     const cookieExist = cookieValue ? JSON.parse(decodeURIComponent(cookieValue)) : null;
-    const cookieUTMs = cookieExist ? cookieExist.parameters : {};
+    var cookieUTMs = cookieExist ? cookieExist.parameters : {};
 
     // Compare current UTM params with those stored in the cookie
     function shouldUpdateCookie(cookieUTMs, currentUTMs) {
