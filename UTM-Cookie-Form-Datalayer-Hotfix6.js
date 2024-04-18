@@ -66,7 +66,7 @@ window.addEventListener("load", (event) => {
 
     setUTMformValues(document, cookieUTMs);
 
-    function populateData(forms, forceSubmit) {
+    function populateData(forms) {
         for (let form of forms) {
             form.addEventListener('submit', (event) => {
                 event.preventDefault(); // prevent page refresh
@@ -106,15 +106,11 @@ window.addEventListener("load", (event) => {
                 let eventId = {};
                 eventId["event_id"] = Date.now().toString();
                 window.dataLayer.push(eventId);
-
-                if (forceSubmit) {
-                    form.submit();
-                }
             });
         }
     }
 
-    var regularForms = document.getElementsByTagName('form');
-    populateData(regularForms, false);
+    var wfForms = document.querySelectorAll('form[id*="wf-form"]');
+    populateData(wfForms);
     
 });
