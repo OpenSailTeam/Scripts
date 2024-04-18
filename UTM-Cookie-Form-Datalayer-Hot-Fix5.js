@@ -46,13 +46,14 @@ window.addEventListener("load", (event) => {
         return Object.keys(currentUTMs).length > 0 && !my_utmParameters.every(param => cookieUTMs[param] === currentUTMs[param]);
     }
 
-    // Update or create cookie with new UTM data if appropriate
+    // Conditionally update cookie with new UTM data if appropriate
     if (shouldUpdateCookie(cookieUTMs, urlUTMParams)) {
         const lead = { parameters: {...cookieUTMs, ...urlUTMParams} };
         setCookie('Lead', encodeURIComponent(JSON.stringify(lead)), 7);
+        cookieUTMs = {...cookieUTMs, ...urlUTMParams}; // Update the local reference with new data
     }
 
-    // Set or update form UTM values
+    // Set or update form UTM values using the most recent UTM data
     function setUTMformValues(doc, utms) {
         my_utmParameters.forEach(param => {
             const utmValue = utms[param] || "";
@@ -63,7 +64,6 @@ window.addEventListener("load", (event) => {
         });
     }
 
-    // Set UTM form values using the most recent UTM data
     setUTMformValues(document, cookieUTMs);
 
     function populateData(forms, forceSubmit) {
