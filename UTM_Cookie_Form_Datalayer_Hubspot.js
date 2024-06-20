@@ -101,7 +101,6 @@ window.addEventListener("load", (event) => {
                     pair[key] = value;
                     window.dataLayer.push(pair);
                 }
-                window.alert(formData);
 
                 let eventId = {};
                 eventId["event_id"] = Date.now().toString();
