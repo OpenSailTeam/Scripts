@@ -1,5 +1,6 @@
 window.addEventListener("load", (event) => {
-    const iframes = document.getElementsByTagName("iframe");
+    javascript:window.dataLayer = window.dataLayer || [];
+    const hubspotIframes = document.getElementsByTagName("iframe");
     const my_utmParameters = [
         "gclid",
         "fbclid",
@@ -65,8 +66,6 @@ window.addEventListener("load", (event) => {
         });
     }
 
-    setUTMformValues(document, cookieUTMs);
-
     function populateData(forms) {
         for (let form of forms) {
             form.addEventListener('submit', (event) => {
@@ -103,20 +102,21 @@ window.addEventListener("load", (event) => {
                     pair[key] = value;
                     window.dataLayer.push(pair);
                 }
+                window.alert(formData);
 
                 let eventId = {};
                 eventId["event_id"] = Date.now().toString();
                 window.dataLayer.push(eventId);
+                form.submit();
             });
-
-          form.submit();
         }
     }
 
-    for (let iframe of iframes) {
+    for (let iframe of hubspotIframes) {
         try {
             var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
             let innerForms = innerDoc.getElementsByTagName('form');
+            setUTMformValues(innerForms, cookieUTMs);
             populateData(innerForms);
         } catch (error) {}
     }
