@@ -1,5 +1,4 @@
 window.addEventListener("load", (event) => {
-    javascript:window.dataLayer = window.dataLayer || [];
     const hubspotIframes = document.getElementsByTagName("iframe");
     const my_utmParameters = [
         "gclid",
