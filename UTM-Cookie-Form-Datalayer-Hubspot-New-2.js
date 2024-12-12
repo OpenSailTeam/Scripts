@@ -1,11 +1,11 @@
 window.addEventListener("load", (event) => {
 
     const my_utmParameters = [
-        "gclid",
-        "fbclid",
-        "source",
-        "medium",
-        "campaign"
+        ["gclid","gclid"],
+        ["fbclid","fbclid"],
+        ["utm_source","source"],
+        ["utm_medium","medium"],
+        ["utm_campaign","campaign"]
     ];
 
     const iframes = document.getElementsByTagName("iframe");
@@ -99,7 +99,7 @@ window.addEventListener("load", (event) => {
             /* if utm_source exist */
             let value_exist = false;
             if (cookieExist != undefined) {
-                let value_exist = JSON.parse(cookieExist).parameters[this_utm_element] == getAllUrlParams[this_utm_element];
+                let value_exist = JSON.parse(cookieExist).parameters[this_utm_element[0]] == getAllUrlParams[this_utm_element[0]];
                 //console.log(`${value_exist} - ${JSON.parse(cookieExist).parameters[this_utm_element]} compare to: ${getAllUrlParams[this_utm_element]}`);
             }
             if (value_exist == false) {
@@ -120,8 +120,8 @@ window.addEventListener("load", (event) => {
 
         /* inner function */
         function set_utm_field(utm_type) {
-            let utm_value = JSON.parse(Cookies.get('Lead')).parameters[utm_type];
-            let queryString = 'input[name*=\'' + utm_type + '\']';
+            let utm_value = JSON.parse(Cookies.get('Lead')).parameters[utm_type[0]];
+            let queryString = 'input[name*=\'' + utm_type[1] + '\']';
             let utm_nodes = doc.querySelectorAll(queryString);
             /* change all utm form fields */
             if (utm_nodes.length > 0) {
