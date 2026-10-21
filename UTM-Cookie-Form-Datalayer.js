@@ -1,18 +1,39 @@
 /**
  * UTM Lead Tracking Script
+ *
+ * Stores tracking parameters (UTMs, click IDs, external referrer) in the "Lead"
+ * cookie and copies them into hidden form fields on every page.
+ *
+ * Setup: include this script. js-cookie is optional (used when present).
+ * Forms get hidden inputs for every tracked parameter added automatically;
+ * existing hidden inputs whose name contains the parameter are reused.
+ *
+ * Opt-outs:
+ * - Whole site: <script src="...UTM-Cookie-Form-Datalayer.js" data-auto-fields="false"></script>
+ * - Single form: <form data-lead-tracking="off">
+ *
+ * Check which version a page is running: window.LeadTracking.version
  */
 (function() {
     'use strict';
     
+    const VERSION = '2026.10.19';
+    
+    // Captured at execution time; document.currentScript is null inside event handlers
+    const currentScript = document.currentScript;
+    
     // Configuration constants
     const CONFIG = {
-        UTM_PARAMETERS: ['gclid', 'fbclid', 'utm_source', 'utm_medium', 'utm_campaign'],
-        LEAD_PARAMETERS: ['gclid', 'fbclid', 'utm_source', 'utm_medium', 'utm_campaign', 'http_referer'],
+        UTM_PARAMETERS: ['gclid', 'gbraid', 'wbraid', 'fbclid', 'utm_source', 'utm_medium', 'utm_campaign'],
+        LEAD_PARAMETERS: ['gclid', 'gbraid', 'wbraid', 'fbclid', 'utm_source', 'utm_medium', 'utm_campaign', 'http_referer'],
         COOKIE_NAME: 'Lead',
         EMPTY_PARAM_VALUE: '',
         EMPTY_REFERER_VALUE: 'empty',
         HIDDEN_FIELD_SELECTORS: '.always-hidden, .form-field-hidden',
-        JOTFORM_CLASS: 'jotform-form'
+        JOTFORM_CLASS: 'jotform-form',
+        AUTO_ADD_FIELDS: !(currentScript && currentScript.getAttribute('data-auto-fields') === 'false'),
+        // Forms that never get hidden fields added: opted out, search, Webflow user accounts, Webflow ecommerce
+        AUTO_ADD_EXCLUDE_SELECTOR: '[data-lead-tracking="off"], [role="search"], [data-wf-user-form-type], [data-node-type^="commerce"]'
     };
     
     // Utility functions for dependency checking
@@ -29,14 +50,6 @@
         }
     }
     
-    function isEmptyObject(obj) {
-        if (isDependencyAvailable('jQuery') && typeof jQuery.isEmptyObject === 'function') {
-            return jQuery.isEmptyObject(obj);
-        }
-        // Fallback implementation
-        return obj === null || obj === undefined || Object.keys(obj).length === 0;
-    }
-    
     // URL parameter utilities
     function getUrlParameters() {
         try {
@@ -47,22 +60,37 @@
         }
     }
     
-    // Cookie utilities
+    function hasTrackingParameters(urlParams) {
+        // Only tracked parameters count; unrelated ones (?search=, pagination) must not reset attribution
+        return CONFIG.UTM_PARAMETERS.some(param => Object.prototype.hasOwnProperty.call(urlParams, param));
+    }
+    
+    // Cookie utilities - use js-cookie when the site loads it, otherwise document.cookie.
+    // Both use path=/ and URI encoding, so cookies written by one are readable by the other.
     function getCookie(name) {
-        if (!isDependencyAvailable('Cookies')) {
-            console.warn('Cookies library not available');
+        if (isDependencyAvailable('Cookies')) {
+            return Cookies.get(name);
+        }
+        const prefix = name + '=';
+        const entry = document.cookie.split('; ').find(cookie => cookie.indexOf(prefix) === 0);
+        if (!entry) {
             return undefined;
         }
-        return Cookies.get(name);
+        try {
+            return decodeURIComponent(entry.slice(prefix.length));
+        } catch (error) {
+            console.warn('Failed to decode cookie:', error.message);
+            return undefined;
+        }
     }
     
     function setCookie(name, value, options = {}) {
-        if (!isDependencyAvailable('Cookies')) {
-            console.warn('Cookies library not available');
-            return false;
-        }
         try {
-            Cookies.set(name, value, options);
+            if (isDependencyAvailable('Cookies')) {
+                Cookies.set(name, value, options);
+            } else {
+                document.cookie = name + '=' + encodeURIComponent(value) + '; path=/';
+            }
             return true;
         } catch (error) {
             console.warn('Failed to set cookie:', error.message);
@@ -71,11 +99,12 @@
     }
     
     function removeCookie(name) {
-        if (!isDependencyAvailable('Cookies')) {
-            return false;
-        }
         try {
-            Cookies.remove(name);
+            if (isDependencyAvailable('Cookies')) {
+                Cookies.remove(name);
+            } else {
+                document.cookie = name + '=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+            }
             return true;
         } catch (error) {
             console.warn('Failed to remove cookie:', error.message);
@@ -192,11 +221,54 @@
         return true;
     }
     
+    // Hidden field creation
+    function isSearchForm(form) {
+        if (form.querySelector('input[type="search"]')) {
+            return true;
+        }
+        const identifiers = [form.id, form.getAttribute('name'), form.getAttribute('data-name'), form.getAttribute('action')];
+        return identifiers.some(value => value && /search/i.test(value));
+    }
+    
+    function shouldAddFieldsToForm(form) {
+        return !form.closest(CONFIG.AUTO_ADD_EXCLUDE_SELECTOR) && !isSearchForm(form);
+    }
+    
+    function addMissingTrackingFields(root) {
+        if (!CONFIG.AUTO_ADD_FIELDS) {
+            return;
+        }
+        
+        const forms = root.tagName === 'FORM' ? [root] : Array.from(root.getElementsByTagName('form'));
+        forms.forEach(form => {
+            try {
+                if (!shouldAddFieldsToForm(form)) {
+                    return;
+                }
+                for (const param of CONFIG.LEAD_PARAMETERS) {
+                    // Same matching as populateFormFields, so manually added fields are reused
+                    if (form.querySelector(`input[name*='${param}']`)) {
+                        continue;
+                    }
+                    const input = form.ownerDocument.createElement('input');
+                    input.type = 'hidden';
+                    input.name = param;
+                    input.className = param;
+                    form.appendChild(input);
+                }
+            } catch (error) {
+                console.warn('Failed to add tracking fields:', error.message);
+            }
+        });
+    }
+    
     // Form field population
     function populateFormFields(doc, leadData) {
         if (!leadData || !leadData.parameters) {
             return;
         }
+        
+        addMissingTrackingFields(doc);
         
         for (const param of CONFIG.LEAD_PARAMETERS) {
             const value = leadData.parameters[param];
@@ -616,7 +688,7 @@
     
     // Main logic orchestration
     function determineLeadAction(urlParams, existingLead) {
-        const hasUrlParams = !isEmptyObject(urlParams);
+        const hasUrlParams = hasTrackingParameters(urlParams);
         const hasExistingLead = existingLead !== null;
         
         if (!hasUrlParams && !hasExistingLead) {
@@ -659,6 +731,21 @@
         return { action: 'none' };
     }
     
+    // Lead data for the current page, used to refresh fields at submit time
+    let currentLeadData = null;
+    
+    function setupSubmitRefresh() {
+        // Capture phase runs before form-level handlers (Webflow, dataLayer push), so forms
+        // added after page load still get fields, and values overwritten by other scripts are restored
+        document.addEventListener('submit', function(event) {
+            const form = event.target;
+            if (!currentLeadData || !form || form.tagName !== 'FORM') {
+                return;
+            }
+            populateFormFields(form, currentLeadData);
+        }, true);
+    }
+    
     function executeLeadAction(action) {
         switch (action.action) {
             case 'create':
@@ -667,11 +754,13 @@
                     removeCookie(CONFIG.COOKIE_NAME);
                 }
                 saveLeadData(action.data);
+                currentLeadData = action.data;
                 populateFormFields(document, action.data);
                 processIframes(action.data);
                 break;
                 
             case 'use_existing':
+                currentLeadData = action.data;
                 populateFormFields(document, action.data);
                 processIframes(action.data);
                 break;
@@ -685,15 +774,10 @@
     
     // Main initialization function
     function initializeLeadTracking() {
-        // Check dependencies
-        if (!isDependencyAvailable('Cookies')) {
-            console.warn('Cookies library not available. Lead tracking will not function properly.');
-            return;
-        }
-        
         try {
             // Set up cross-origin message handling
             setupCrossOriginMessageHandler();
+            setupSubmitRefresh();
             
             // Get current state
             const urlParams = getUrlParameters();
@@ -711,6 +795,15 @@
         }
     }
     
-    // Initialize when DOM is loaded
-    window.addEventListener('load', initializeLeadTracking);
+    window.LeadTracking = {
+        version: VERSION,
+        getLeadData: getExistingLeadData
+    };
+    
+    // Initialize when the page has loaded (immediately if the script was injected after load)
+    if (document.readyState === 'complete') {
+        initializeLeadTracking();
+    } else {
+        window.addEventListener('load', initializeLeadTracking);
+    }
 })();
